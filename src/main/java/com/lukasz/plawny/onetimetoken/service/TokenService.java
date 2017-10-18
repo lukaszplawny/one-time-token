@@ -6,7 +6,7 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 
 public interface TokenService {
 	
-	Token generateToken(URL url);
+	Token createToken(URL url);
 	Token findToken(String tokenId);
 
 }

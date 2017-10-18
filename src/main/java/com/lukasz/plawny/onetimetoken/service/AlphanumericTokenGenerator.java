@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RandomTokenGenerator implements TokenGenerator {
+public class AlphanumericTokenGenerator implements TokenGenerator {
 
 	private static final String UPPER_LETTER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final String LOWER_LETTER = UPPER_LETTER.toLowerCase();
@@ -14,11 +14,12 @@ public class RandomTokenGenerator implements TokenGenerator {
 
 	@Override
 	public String generateToken(int numberOfCharacters) {
+		if (numberOfCharacters <= 0)
+			throw new IllegalArgumentException("Token length must be greater than 0");
 		SecureRandom secureRandom = new SecureRandom();
-		StringBuffer tokenBuffer = new StringBuffer();
+		StringBuilder tokenBuilder = new StringBuilder();
 		for (int i = 0; i < numberOfCharacters; i++)
-			tokenBuffer.append(AVAILABLE_CHARACTERS.charAt(secureRandom.nextInt(AVAILABLE_CHARACTERS.length())));
-		return tokenBuffer.toString();
+			tokenBuilder.append(AVAILABLE_CHARACTERS.charAt(secureRandom.nextInt(AVAILABLE_CHARACTERS.length())));
+		return tokenBuilder.toString();
 	}
-
 }

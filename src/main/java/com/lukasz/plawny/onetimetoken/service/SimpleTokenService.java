@@ -11,7 +11,7 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 @Service
 public class SimpleTokenService implements TokenService {
 
-	private static final int TOKEN_LENGTH = 5;
+	private static final int TOKEN_LENGTH = 12;
 
 	private final TokenGenerator tokenGenerator;
 	private final TokenDao tokenDao;
@@ -22,21 +22,13 @@ public class SimpleTokenService implements TokenService {
 		this.tokenDao = tokenDao;
 	}
 
-	// check if this synchronized is sufficient
 	@Override
-	public Token generateToken(URL url) {
-		String tokenId;
+	public Token createToken(URL url) {
 		Token token = new Token();
 		token.setUrl(url);
-		synchronized (TokenService.class) {
-			do {
-				tokenId = tokenGenerator.generateToken(TOKEN_LENGTH);
-			} while (tokenDao.find(tokenId) != null);
-
-			token.setTokenId(tokenId);
-			tokenDao.create(token);
-		}
-		return token;
+		String tokenId = tokenGenerator.generateToken(TOKEN_LENGTH);
+		token.setTokenId(tokenId);
+		return tokenDao.create(token);
 	}
 
 	@Override

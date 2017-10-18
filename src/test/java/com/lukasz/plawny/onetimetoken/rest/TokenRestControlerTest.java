@@ -23,7 +23,7 @@ import com.lukasz.plawny.onetimetoken.service.TokenService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = TokenRestControler.class)
-public class TokenResourceTest {
+public class TokenRestControlerTest {
 
 	@MockBean
 	private TokenService tokenService;
@@ -32,37 +32,37 @@ public class TokenResourceTest {
 	private MockMvc mockMvc;
 
 	private URL url;
-	private Token token;
+	private Token predefinedToken;
 
 	@Before
-	public void init() throws MalformedURLException {
+	public void createPredefinedTokenAndMockTokenService() throws MalformedURLException {
 		url = new URL("http://www.google.com");
-		token = new Token();
-		token.setUrl(url);
-		token.setTokenId("sampleid1");
-		Mockito.when(tokenService.generateToken(url)).thenReturn(token);
+		predefinedToken = new Token();
+		predefinedToken.setUrl(url);
+		predefinedToken.setTokenId("sampleid1");
+		Mockito.when(tokenService.createToken(url)).thenReturn(predefinedToken);
 		Mockito.when(tokenService.findToken("invalidtoken")).thenReturn(null);
-		Mockito.when(tokenService.findToken(token.getTokenId())).thenReturn(token);
+		Mockito.when(tokenService.findToken(predefinedToken.getTokenId())).thenReturn(predefinedToken);
 	}
 
 	@Test
-	public void shouldCreateNewToken() throws Exception {
+	public void createToken_shouldReturnNewToken() throws Exception {
 		MvcResult result = mockMvc
-				.perform(MockMvcRequestBuilders.post("/token").param("url", token.getUrl().toString()))
+				.perform(MockMvcRequestBuilders.post("/token").param("url", predefinedToken.getUrl().toString()))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
-		assertEquals(token.getTokenId(), result.getResponse().getContentAsString());
+		assertEquals(predefinedToken.getTokenId(), result.getResponse().getContentAsString());
 	}
 
 	@Test
-	public void shouldReturnNotFound_WhenTokenIsInvalid() throws Exception {
+	public void useToken_ShouldReturnNotFound_WhenTokenIsInvalid() throws Exception {
 		mockMvc.perform(MockMvcRequestBuilders.get("/token/invalidtoken"))
 				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 
 	@Test
-	public void shouldRedirectToUrl_WhenTokenIsValid() throws Exception {
-		mockMvc.perform(MockMvcRequestBuilders.get("/token/" + token.getTokenId()))
-				.andExpect(MockMvcResultMatchers.redirectedUrl(token.getUrl().toString()));
+	public void useToken_ShouldRedirectToUrl_WhenTokenIsValid() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/token/" + predefinedToken.getTokenId()))
+				.andExpect(MockMvcResultMatchers.redirectedUrl(predefinedToken.getUrl().toString()));
 	}
 	
 	//TODO test with MalformedUrlException

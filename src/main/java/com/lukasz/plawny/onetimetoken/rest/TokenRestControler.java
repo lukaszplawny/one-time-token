@@ -22,7 +22,7 @@ public class TokenRestControler {
 
 	@RequestMapping(value = "/token", method = RequestMethod.POST)
 	public String createToken(@RequestParam URL url, HttpServletResponse response) {
-		Token token = tokenService.generateToken(url);
+		Token token = tokenService.createToken(url);
 		response.setStatus(HttpServletResponse.SC_CREATED);
 		return token.getTokenId();
 	}
@@ -35,7 +35,6 @@ public class TokenRestControler {
 		else {
 			response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
 			response.setHeader("Location", token.getUrl().toString());
-//			ResponseEntity
 		}
 	}
 }

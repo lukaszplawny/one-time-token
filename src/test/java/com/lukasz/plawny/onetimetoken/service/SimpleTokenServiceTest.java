@@ -21,6 +21,10 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 @SpringBootTest
 public class SimpleTokenServiceTest {
 	
+	private static final String VALID_TOKEN_ID = "sampleToken1";
+	private static final String INVALID_TOKEN_ID = "invalidTokenId";
+	private static final int DEFAULT_TOKEN_LENGTH = 12;
+	
 	@MockBean
 	private TokenDao tokenDao;
 	
@@ -28,38 +32,40 @@ public class SimpleTokenServiceTest {
 	private TokenGenerator tokenGenerator;
 	
 	@Autowired
-	private TokenService tokenService;
+	private SimpleTokenService tokenService;
 	
 	private Token predefinedToken;
+	private URL url;
 	
 	@Before
-	public void init() throws MalformedURLException{
+	public void createPredefinedTokenAndPrepareMocks() throws MalformedURLException{
+		url = new URL("http://www.google.com");
 		predefinedToken = new Token();
-		predefinedToken.setTokenId("tokenId");
-		predefinedToken.setUrl(new URL("http://www.google.com"));
+		predefinedToken.setTokenId(VALID_TOKEN_ID);
+		predefinedToken.setUrl(url);
 		Mockito.when(tokenDao.create(predefinedToken)).thenReturn(predefinedToken);
-		Mockito.when(tokenDao.find("tokenid")).thenReturn(predefinedToken);
-		Mockito.when(tokenDao.find("invalidtokenid")).thenReturn(null);
+		Mockito.when(tokenDao.find(VALID_TOKEN_ID)).thenReturn(predefinedToken);
+		Mockito.when(tokenDao.find(INVALID_TOKEN_ID)).thenReturn(null);
+		Mockito.when(tokenGenerator.generateToken(DEFAULT_TOKEN_LENGTH)).thenReturn(VALID_TOKEN_ID);
 	}
 
 	@Test
-	public void shouldGenerateTokenForUrl() throws MalformedURLException{
-		URL url = new URL("http://www.google.com");
-		Token token = tokenService.generateToken(url);
-		assertEquals(predefinedToken, token);
+	public void createToken_ShouldCreateTokenForUrl() {
+		Token token = tokenService.createToken(url);
+		assertEquals(VALID_TOKEN_ID, token.getTokenId());
+		assertEquals(url, token.getUrl());
 	}
 	
 	@Test
-	public void shouldReturnNull_WhenTokenNotFound() {
-		Token token = tokenService.findToken("invalidtokenid");
-		assertEquals(null, token);
+	public void findToken_ShouldReturnNull_WhenTokenNotFound() {
+		Token token = tokenService.findToken(INVALID_TOKEN_ID);
+		assertNull(token);
 	}
 	
 	@Test
-	public void shouldReturnToken_WhenTokenFound() {
-		Token token = tokenService.findToken("tokenid");
+	public void findToken_ShouldReturnToken_WhenTokenFound() {
+		Token token = tokenService.findToken(VALID_TOKEN_ID);
 		assertEquals(predefinedToken, token);
 		
 	}
-
 }
