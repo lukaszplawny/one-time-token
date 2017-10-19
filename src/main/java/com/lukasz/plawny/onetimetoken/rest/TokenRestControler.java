@@ -27,9 +27,9 @@ public class TokenRestControler {
 		return token.getTokenId();
 	}
 
-	@RequestMapping(value = "/token/{tokenValue}", method = RequestMethod.GET)
-	public void useToken(@PathVariable String tokenValue, HttpServletResponse response) {
-		Token token = tokenService.findToken(tokenValue);
+	@RequestMapping(value = "/token/{tokenId}", method = RequestMethod.GET)
+	public void useToken(@PathVariable String tokenId, HttpServletResponse response) {
+		Token token = tokenService.findToken(tokenId);
 		if (token == null)
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		else {

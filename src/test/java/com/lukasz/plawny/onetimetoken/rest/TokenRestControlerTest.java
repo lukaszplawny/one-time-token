@@ -1,6 +1,7 @@
 package com.lukasz.plawny.onetimetoken.rest;
 
 import static org.junit.Assert.*;
+import static com.lukasz.plawny.onetimetoken.testutils.OneTimeTokenTestConstants.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,35 +37,43 @@ public class TokenRestControlerTest {
 
 	@Before
 	public void createPredefinedTokenAndMockTokenService() throws MalformedURLException {
-		url = new URL("http://www.google.com");
+		url = new URL(GOOGLE_URL);
 		predefinedToken = new Token();
 		predefinedToken.setUrl(url);
-		predefinedToken.setTokenId("sampleid1");
+		predefinedToken.setTokenId(VALID_TOKEN_ID);
 		Mockito.when(tokenService.createToken(url)).thenReturn(predefinedToken);
-		Mockito.when(tokenService.findToken("invalidtoken")).thenReturn(null);
-		Mockito.when(tokenService.findToken(predefinedToken.getTokenId())).thenReturn(predefinedToken);
+		Mockito.when(tokenService.findToken(INVALID_TOKEN_ID)).thenReturn(null);
+		Mockito.when(tokenService.findToken(VALID_TOKEN_ID)).thenReturn(predefinedToken);
 	}
 
 	@Test
 	public void createToken_shouldReturnNewToken() throws Exception {
-		MvcResult result = mockMvc
-				.perform(MockMvcRequestBuilders.post("/token").param("url", predefinedToken.getUrl().toString()))
+		MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post(TOKEN_REST_ENDPOINT).param("url", GOOGLE_URL))
 				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
-		assertEquals(predefinedToken.getTokenId(), result.getResponse().getContentAsString());
+		assertEquals(VALID_TOKEN_ID, result.getResponse().getContentAsString());
 	}
 
 	@Test
 	public void useToken_ShouldReturnNotFound_WhenTokenIsInvalid() throws Exception {
-		mockMvc.perform(MockMvcRequestBuilders.get("/token/invalidtoken"))
+		mockMvc.perform(MockMvcRequestBuilders.get(TOKEN_REST_ENDPOINT + "/" + INVALID_TOKEN_ID))
 				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 
 	@Test
 	public void useToken_ShouldRedirectToUrl_WhenTokenIsValid() throws Exception {
-		mockMvc.perform(MockMvcRequestBuilders.get("/token/" + predefinedToken.getTokenId()))
-				.andExpect(MockMvcResultMatchers.redirectedUrl(predefinedToken.getUrl().toString()));
+		mockMvc.perform(MockMvcRequestBuilders.get(TOKEN_REST_ENDPOINT + "/" + VALID_TOKEN_ID))
+				.andExpect(MockMvcResultMatchers.redirectedUrl(GOOGLE_URL));
 	}
-	
-	//TODO test with MalformedUrlException
 
+	@Test
+	public void createToken_ShouldReturnBadRequest_WhenUrlParameterIsMissed() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.post(TOKEN_REST_ENDPOINT))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest());
+	}
+
+	@Test
+	public void createToken_ShouldReturnBadRequest_WhenUrlIsInvalid() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.post(TOKEN_REST_ENDPOINT).param("url", INVALID_URL))
+		.andExpect(MockMvcResultMatchers.status().isBadRequest());
+	}
 }
