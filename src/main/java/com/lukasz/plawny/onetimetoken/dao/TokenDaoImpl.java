@@ -19,7 +19,7 @@ public class TokenDaoImpl implements TokenDao {
 	private final WriteOptions writeOptions;
 
 	@Autowired
-	public TokenDaoImpl(@Value(("${token.ttl:20}")) int ttl) {
+	public TokenDaoImpl(@Value("${token.ttl:20}") int ttl) {
 		writeOptions = new WriteOptions();
 		if (ttl > 0)
 			writeOptions.setTtl(ttl);

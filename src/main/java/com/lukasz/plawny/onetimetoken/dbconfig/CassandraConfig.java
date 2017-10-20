@@ -3,6 +3,7 @@ package com.lukasz.plawny.onetimetoken.dbconfig;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cassandra.config.CassandraCqlClusterFactoryBean;
 import org.springframework.cassandra.config.DataCenterReplication;
 import org.springframework.cassandra.core.keyspace.CreateKeyspaceSpecification;
@@ -16,20 +17,26 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 @EnableCassandraRepositories
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
+	
 	private static final String KEYSPACE = "one_time_token_keyspace";
-	private static final String USERNAME = "cassandra";
-	private static final String PASSWORD = "cassandra";
-	private static final String NODES = "localhost";
-	private static final int PORT = 9142;
+	
+	@Value("${spring.data.cassandra.username}")
+	private String username;
+	@Value("${spring.data.cassandra.password}")
+	private String password;
+	@Value("${spring.data.cassandra.contact-points}")
+	private String nodes;
+	@Value("${spring.data.cassandra.port}")
+	private int port;
 
 	@Bean
 	@Override
 	public CassandraCqlClusterFactoryBean cluster() {
 		CassandraCqlClusterFactoryBean bean = new CassandraCqlClusterFactoryBean();
 		bean.setKeyspaceCreations(getKeyspaceCreations());
-		bean.setContactPoints(NODES);
-		bean.setUsername(USERNAME);
-		bean.setPassword(PASSWORD);
+		bean.setContactPoints(nodes);
+		bean.setUsername(username);
+		bean.setPassword(password);
 		return bean;
 	}
 
@@ -50,7 +57,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 
 	@Override
 	protected int getPort() {
-		return PORT;
+		return port;
 	}
 
 	@Override
