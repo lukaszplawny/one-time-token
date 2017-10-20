@@ -1,5 +1,7 @@
 package com.lukasz.plawny.onetimetoken.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cassandra.core.WriteOptions;
@@ -11,7 +13,8 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 @Repository
 public class TokenDaoImpl implements TokenDao {
 	
-	private static int DEFAULT_TOKEN_TTL = 20;
+	private static final int DEFAULT_TOKEN_TTL = 20;
+	private static final Logger logger = LoggerFactory.getLogger(TokenDaoImpl.class);
 
 	@Autowired
 	private CassandraOperations cassandraOperations;
@@ -21,10 +24,14 @@ public class TokenDaoImpl implements TokenDao {
 	@Autowired
 	public TokenDaoImpl(@Value("${token.ttl:20}") int ttl) {
 		writeOptions = new WriteOptions();
-		if (ttl > 0)
+		if (ttl > 0) {
 			writeOptions.setTtl(ttl);
-		else
+		}
+		else {
 			writeOptions.setTtl(DEFAULT_TOKEN_TTL);
+			logger.warn("TTL is equal or less than zero, using default TTL value.");;
+		}
+		logger.info("TTL set to " + writeOptions.getTtl());
 	}
 
 	public Token create(Token token) {
