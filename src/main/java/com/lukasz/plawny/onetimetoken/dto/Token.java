@@ -10,7 +10,7 @@ import org.springframework.data.cassandra.mapping.Table;
 
 import com.datastax.driver.core.DataType.Name;
 
-@Table(value = "Tokens")
+@Table(value = "tokens")
 public class Token implements Serializable {
 
 	@PrimaryKey
@@ -19,9 +19,6 @@ public class Token implements Serializable {
 	@CassandraType(type = Name.VARCHAR)
 	@Column
 	private URL url;
-
-	public Token() {
-	}
 
 	public void setTokenId(String tokenId) {
 		this.tokenId = tokenId;

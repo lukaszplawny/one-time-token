@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AlphanumericTokenGenerator implements TokenGenerator {
+public class AlphaNumericTokenGenerator implements TokenGenerator {
 
 	private static final String UPPER_LETTER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private static final String LOWER_LETTER = UPPER_LETTER.toLowerCase();
@@ -19,7 +19,11 @@ public class AlphanumericTokenGenerator implements TokenGenerator {
 		SecureRandom secureRandom = new SecureRandom();
 		StringBuilder tokenBuilder = new StringBuilder();
 		for (int i = 0; i < numberOfCharacters; i++)
-			tokenBuilder.append(AVAILABLE_CHARACTERS.charAt(secureRandom.nextInt(AVAILABLE_CHARACTERS.length())));
+			tokenBuilder.append(randomAlphaNumericCharacter(secureRandom));
 		return tokenBuilder.toString();
+	}
+
+	private char randomAlphaNumericCharacter(SecureRandom secureRandom) {
+		return AVAILABLE_CHARACTERS.charAt(secureRandom.nextInt(AVAILABLE_CHARACTERS.length()));
 	}
 }

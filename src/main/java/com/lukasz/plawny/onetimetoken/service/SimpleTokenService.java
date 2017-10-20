@@ -24,6 +24,8 @@ public class SimpleTokenService implements TokenService {
 
 	@Override
 	public Token createToken(URL url) {
+		if (url == null)
+			throw new IllegalArgumentException("The url cannot be null");
 		Token token = new Token();
 		token.setUrl(url);
 		String tokenId = tokenGenerator.generateToken(TOKEN_LENGTH);
@@ -35,5 +37,4 @@ public class SimpleTokenService implements TokenService {
 	public Token findToken(String tokenId) {
 		return tokenDao.find(tokenId);
 	}
-
 }

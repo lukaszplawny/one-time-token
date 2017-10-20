@@ -1,7 +1,7 @@
 package com.lukasz.plawny.onetimetoken.rest;
 
+import static com.lukasz.plawny.onetimetoken.testutil.OneTimeTokenTestUtility.*;
 import static org.junit.Assert.*;
-import static com.lukasz.plawny.onetimetoken.testutils.OneTimeTokenTestConstants.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,15 +32,12 @@ public class TokenRestControlerTest {
 	@Autowired
 	private MockMvc mockMvc;
 
-	private URL url;
 	private Token predefinedToken;
 
 	@Before
 	public void createPredefinedTokenAndMockTokenService() throws MalformedURLException {
-		url = new URL(GOOGLE_URL);
-		predefinedToken = new Token();
-		predefinedToken.setUrl(url);
-		predefinedToken.setTokenId(VALID_TOKEN_ID);
+		predefinedToken = createPredefinedTokenForGoogleUrl();
+		URL url = new URL(GOOGLE_URL);
 		Mockito.when(tokenService.createToken(url)).thenReturn(predefinedToken);
 		Mockito.when(tokenService.findToken(INVALID_TOKEN_ID)).thenReturn(null);
 		Mockito.when(tokenService.findToken(VALID_TOKEN_ID)).thenReturn(predefinedToken);

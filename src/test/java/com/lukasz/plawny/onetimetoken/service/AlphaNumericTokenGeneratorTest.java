@@ -15,7 +15,7 @@ public class AlphaNumericTokenGeneratorTest {
 	private static final int CUSTOM_TOKEN_LENGTH = 24;
 
 	@Autowired
-	private AlphanumericTokenGenerator tokenGenerator;
+	private AlphaNumericTokenGenerator tokenGenerator;
 	
 	@Test
 	public void generateToken_ShouldReturnTokenWithSpecifiedNumberOfCharacters() {

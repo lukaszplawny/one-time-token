@@ -1,5 +1,6 @@
 package com.lukasz.plawny.onetimetoken.service;
 
+import static com.lukasz.plawny.onetimetoken.testutil.OneTimeTokenTestUtility.*;
 import static org.junit.Assert.*;
 
 import java.net.MalformedURLException;
@@ -21,8 +22,6 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 @SpringBootTest
 public class SimpleTokenServiceTest {
 	
-	private static final String VALID_TOKEN_ID = "sampleToken1";
-	private static final String INVALID_TOKEN_ID = "invalidTokenId";
 	private static final int DEFAULT_TOKEN_LENGTH = 12;
 	
 	@MockBean
@@ -35,14 +34,10 @@ public class SimpleTokenServiceTest {
 	private SimpleTokenService tokenService;
 	
 	private Token predefinedToken;
-	private URL url;
 	
 	@Before
 	public void createPredefinedTokenAndPrepareMocks() throws MalformedURLException{
-		url = new URL("http://www.google.com");
-		predefinedToken = new Token();
-		predefinedToken.setTokenId(VALID_TOKEN_ID);
-		predefinedToken.setUrl(url);
+		predefinedToken = createPredefinedTokenForGoogleUrl();
 		Mockito.when(tokenDao.create(predefinedToken)).thenReturn(predefinedToken);
 		Mockito.when(tokenDao.find(VALID_TOKEN_ID)).thenReturn(predefinedToken);
 		Mockito.when(tokenDao.find(INVALID_TOKEN_ID)).thenReturn(null);
@@ -50,7 +45,8 @@ public class SimpleTokenServiceTest {
 	}
 
 	@Test
-	public void createToken_ShouldCreateTokenForUrl() {
+	public void createToken_ShouldCreateTokenForUrl() throws MalformedURLException {
+		URL url = new URL(GOOGLE_URL);
 		Token token = tokenService.createToken(url);
 		assertEquals(VALID_TOKEN_ID, token.getTokenId());
 		assertEquals(url, token.getUrl());
@@ -66,6 +62,5 @@ public class SimpleTokenServiceTest {
 	public void findToken_ShouldReturnToken_WhenTokenFound() {
 		Token token = tokenService.findToken(VALID_TOKEN_ID);
 		assertEquals(predefinedToken, token);
-		
 	}
 }
