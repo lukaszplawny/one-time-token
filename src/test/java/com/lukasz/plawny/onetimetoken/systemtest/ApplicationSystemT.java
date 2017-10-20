@@ -33,7 +33,6 @@ public class ApplicationSystemT {
 	public static void setup() {
 		RestAssured.port = Integer.valueOf(8080);
 		RestAssured.baseURI = "http://localhost";
-
 	}
 
 	@Test

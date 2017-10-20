@@ -1,11 +1,12 @@
 # One Time Token
 Application generates one time token for specified url. Token is valid for a limited time.
-When user send request with valid token, then it is redirected to url related to the token.
+When user sends request with valid token, then the user is redirected to url related to the token.
 If the token is invalid, then 404 http response code is returned.
 
 ## Getting Started
 
 ### Prerequisites
+To run application/system test:
 * Cassandra database for storing tokens is installed and running,
 
 ### Installation
@@ -16,7 +17,9 @@ git clone https://github.com/lukaszplawny/one-time-token.git
 2. Optional step: 
 Change default configuration
 * Tune token time-to-live if needed. Default TTL value is set to 20 seconds. TTL value needs to be greater than 0, otherwise default value is used.
-* Change Cassandra properties. Needed if not default user, host or port are used.
+* Change Cassandra properties. Needed if:
+** Casandra uses internal authentication and default username/password has been changed, 
+** Cassandra is not running on localhost, or not default port is used,
 ```
 cat ./src/main/resources/config/application.properties 
 # Application specific configuration
@@ -30,11 +33,11 @@ spring.data.cassandra.password=cassandra
 spring.data.cassandra.username=cassandra
 ```
 3. Optional step: 
-Build and test the application
+Run unit test and build the application (system test are skipped by default):
 ```
 mvn clean install
 ```
-or build and execute system test (system tests are skipped by default):
+Run unit test, system test and build the application. To perform this step Cassandra needs to be installed and running.
 ```
 mvn clean install -Dsystemtest.skip=false
 ```
@@ -101,5 +104,5 @@ lukas@lukas-laptop:~$
 
 ## TO DOs:
 
-* improve logging
-* separete system test and application by introducing two maven modules. spring-boot-plugin doesn't support starting application from another module, so other plugin needs to be used ()
+* improve logging in tests
+* separete system test and application by introducing two maven modules. spring-boot-plugin doesn't support starting application from another module, so other plugin needs to be used

@@ -14,7 +14,7 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 public class SimpleTokenService implements TokenService {
 
 	private static final int TOKEN_LENGTH = 12;
-	private static final Logger logger = LoggerFactory.getLogger(SimpleTokenService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleTokenService.class);
 
 	private final TokenGenerator tokenGenerator;
 	private final TokenDao tokenDao;
@@ -27,13 +27,15 @@ public class SimpleTokenService implements TokenService {
 
 	@Override
 	public Token createToken(URL url) {
-		if (url == null)
+		if (url == null) {
+			LOGGER.error("Url is a null, skipping token creation");
 			throw new IllegalArgumentException("The url cannot be null");
+		}
 		Token token = new Token();
 		token.setUrl(url);
 		String tokenId = tokenGenerator.generateToken(TOKEN_LENGTH);
 		token.setTokenId(tokenId);
-		logger.info("New token generated: " + tokenId + " for url " + url);
+		LOGGER.info("New token generated: " + tokenId + " for url " + url);
 		return tokenDao.create(token);
 	}
 

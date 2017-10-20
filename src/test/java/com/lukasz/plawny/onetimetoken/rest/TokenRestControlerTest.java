@@ -35,7 +35,7 @@ public class TokenRestControlerTest {
 	private Token predefinedToken;
 
 	@Before
-	public void createPredefinedTokenAndMockTokenService() throws MalformedURLException {
+	public void setUp() throws MalformedURLException {
 		predefinedToken = createPredefinedTokenForGoogleUrl();
 		URL url = new URL(GOOGLE_URL);
 		Mockito.when(tokenService.createToken(url)).thenReturn(predefinedToken);

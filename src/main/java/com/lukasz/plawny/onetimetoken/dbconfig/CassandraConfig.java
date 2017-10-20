@@ -17,9 +17,8 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 @EnableCassandraRepositories
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
-	
 	private static final String KEYSPACE = "one_time_token_keyspace";
-	
+
 	@Value("${spring.data.cassandra.username}")
 	private String username;
 	@Value("${spring.data.cassandra.password}")
@@ -41,6 +40,13 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 	}
 
 	@Override
+	protected List<CreateKeyspaceSpecification> getKeyspaceCreations() {
+		List<CreateKeyspaceSpecification> createKeyspaceSpecifications = new ArrayList<>();
+		createKeyspaceSpecifications.add(getKeySpaceSpecification());
+		return createKeyspaceSpecifications;
+	}
+
+	@Override
 	public String[] getEntityBasePackages() {
 		return new String[] { "com.lukasz.plawny.onetimetoken.dto" };
 	}
@@ -58,13 +64,6 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 	@Override
 	protected int getPort() {
 		return port;
-	}
-
-	@Override
-	protected List<CreateKeyspaceSpecification> getKeyspaceCreations() {
-		List<CreateKeyspaceSpecification> createKeyspaceSpecifications = new ArrayList<>();
-		createKeyspaceSpecifications.add(getKeySpaceSpecification());
-		return createKeyspaceSpecifications;
 	}
 
 	private CreateKeyspaceSpecification getKeySpaceSpecification() {

@@ -8,30 +8,28 @@ import java.net.MalformedURLException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.internal.util.reflection.Whitebox;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.cassandra.core.WriteOptions;
 import org.springframework.data.cassandra.core.CassandraOperations;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.lukasz.plawny.onetimetoken.dto.Token;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class TokenDaoImplTest {
 
-	@MockBean
+	@Mock
 	private CassandraOperations cassandraOperations;
 
-	@Autowired
-	private TokenDaoImpl tokenDao;
-
+	private TokenDao tokenDao;
 	private Token predefinedToken;
 
 	@Before
-	public void createPredefinedTokenAndPrepareMocks() throws MalformedURLException {
+	public void setUp() throws MalformedURLException {
+		tokenDao = new TokenDaoImpl(20);
+		Whitebox.setInternalState(tokenDao, "cassandraOperations", cassandraOperations);
 		predefinedToken = createPredefinedTokenForGoogleUrl();
 		Mockito.when(cassandraOperations.insert(Mockito.eq(predefinedToken), Mockito.any(WriteOptions.class)))
 				.thenReturn(predefinedToken);
