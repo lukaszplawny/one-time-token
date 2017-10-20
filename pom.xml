@@ -56,21 +56,24 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<skip>${systemtest.skip}</skip>
-				</configuration>
 				<executions>
 					<execution>
 						<id>pre-integration-test</id>
 						<goals>
 							<goal>start</goal>
 						</goals>
+						<configuration>
+							<skip>${systemtest.skip}</skip>
+						</configuration>
 					</execution>
 					<execution>
 						<id>post-integration-test</id>
 						<goals>
 							<goal>stop</goal>
 						</goals>
+						<configuration>
+							<skip>${systemtest.skip}</skip>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

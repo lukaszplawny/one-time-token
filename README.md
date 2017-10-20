@@ -18,8 +18,8 @@ git clone https://github.com/lukaszplawny/one-time-token.git
 Change default configuration
 * Tune token time-to-live if needed. Default TTL value is set to 20 seconds. TTL value needs to be greater than 0, otherwise default value is used.
 * Change Cassandra properties. Needed if:
-** Casandra uses internal authentication and default username/password has been changed, 
-** Cassandra is not running on localhost, or not default port is used,
+	* Casandra uses internal authentication and default username/password has been changed, 
+	* Cassandra is not running on localhost, or not default port is used,
 ```
 cat ./src/main/resources/config/application.properties 
 # Application specific configuration
