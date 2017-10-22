@@ -14,7 +14,7 @@ import com.lukasz.plawny.onetimetoken.dto.Token;
 public class TokenDaoImpl implements TokenDao {
 	
 	private static final int DEFAULT_TOKEN_TTL = 20;
-	private static final Logger logger = LoggerFactory.getLogger(TokenDaoImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TokenDaoImpl.class);
 
 	@Autowired
 	private CassandraOperations cassandraOperations;
@@ -29,9 +29,9 @@ public class TokenDaoImpl implements TokenDao {
 		}
 		else {
 			writeOptions.setTtl(DEFAULT_TOKEN_TTL);
-			logger.warn("TTL is equal or less than zero, using default TTL value.");;
+			LOGGER.warn("TTL is equal or less than zero, using default TTL value.");;
 		}
-		logger.info("TTL set to " + writeOptions.getTtl());
+		LOGGER.info("TTL set to " + writeOptions.getTtl());
 	}
 
 	public Token create(Token token) {

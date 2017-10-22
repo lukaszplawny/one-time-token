@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,28 +27,30 @@ import com.lukasz.plawny.onetimetoken.dbconfig.CassandraConfig;
 import com.lukasz.plawny.onetimetoken.dto.Token;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource("classpath:config/application.properties")
 @SpringBootTest(classes = CassandraConfig.class)
+@TestPropertySource("classpath:config/application.properties")
 public class ApplicationSystemT {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationSystemT.class);
 
 	@Autowired
 	private CassandraOperations cassandraOperations;
 
 	@Value("${token.ttl:20}")
-	private static int ttl;
+	private int ttl;
 
 	private List<String> createdTokenId;
 
 	@BeforeClass
 	public static void setupBeforeClass() {
-		if (ttl <= 0)
-			ttl = 20;
 		RestAssured.port = 8080;
 		RestAssured.baseURI = "http://localhost";
 	}
 
 	@Before
 	public void setup() {
+		ttl = ttl <= 0 ? 20 : ttl; // set ttl to default value if value in
+									// properties file is less or equal 0
 		createdTokenId = new ArrayList<>();
 	}
 
@@ -86,6 +90,7 @@ public class ApplicationSystemT {
 		Token tokenFromDb = getTokenFromDb(tokenId);
 		assertEquals(GOOGLE_URL, tokenFromDb.getUrl().toString());
 
+		LOGGER.info("Sleeping " + ttl + " seconds");
 		Thread.sleep(ttl * 1000);
 		RestAssured.given().when().get(TOKEN_REST_ENDPOINT + "/" + tokenId).then().statusCode(404);
 
@@ -105,11 +110,11 @@ public class ApplicationSystemT {
 		Token tokenFromDb = getTokenFromDb(tokenId);
 		assertEquals(GOOGLE_URL, tokenFromDb.getUrl().toString());
 
-		for (int i = 1; i < ttl; i++) {
-			RestAssured.given().when().redirects().follow(false).get(TOKEN_REST_ENDPOINT + "/" + tokenId).then()
-					.statusCode(302).and().header("location", GOOGLE_URL);
-			Thread.sleep(1000);
-		}
+		int oneSecondBeforeTokenExpiration = ttl - 1;
+		LOGGER.info("Sleeping " + oneSecondBeforeTokenExpiration + " seconds");
+		Thread.sleep(1000 * oneSecondBeforeTokenExpiration);
+		RestAssured.given().when().redirects().follow(false).get(TOKEN_REST_ENDPOINT + "/" + tokenId).then()
+				.statusCode(302).and().header("location", GOOGLE_URL);
 	}
 
 	private Response performPostReqestForTokenWithGoogleUrl() {
