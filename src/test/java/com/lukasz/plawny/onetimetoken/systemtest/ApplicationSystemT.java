@@ -1,8 +1,14 @@
 package com.lukasz.plawny.onetimetoken.systemtest;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.lukasz.plawny.onetimetoken.testutil.OneTimeTokenTestUtility.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,12 +33,28 @@ public class ApplicationSystemT {
 	private CassandraOperations cassandraOperations;
 
 	@Value("${token.ttl:20}")
-	private int ttl;
+	private static int ttl;
+
+	private List<String> createdTokenId;
 
 	@BeforeClass
-	public static void setup() {
-		RestAssured.port = Integer.valueOf(8080);
+	public static void setupBeforeClass() {
+		if (ttl <= 0)
+			ttl = 20;
+		RestAssured.port = 8080;
 		RestAssured.baseURI = "http://localhost";
+	}
+
+	@Before
+	public void setup() {
+		createdTokenId = new ArrayList<>();
+	}
+
+	@After
+	public void tearDown() {
+		for (String tokenId : createdTokenId) {
+			cassandraOperations.deleteById(Token.class, tokenId);
+		}
 	}
 
 	@Test
@@ -41,11 +63,14 @@ public class ApplicationSystemT {
 		assertEquals(201, response.statusCode());
 
 		String tokenId = response.getBody().asString();
+		createdTokenId.add(tokenId); // add token to a list of created tokens,
+										// so it can be removed after testcase
+
 		Token tokenFromDb = getTokenFromDb(tokenId);
 		assertEquals(GOOGLE_URL, tokenFromDb.getUrl().toString());
 
-		RestAssured.given().when().redirects().follow(false).get(TOKEN_REST_ENDPOINT + "/" + tokenId).then().statusCode(302)
-				.and().header("location", GOOGLE_URL);
+		RestAssured.given().when().redirects().follow(false).get(TOKEN_REST_ENDPOINT + "/" + tokenId).then()
+				.statusCode(302).and().header("location", GOOGLE_URL);
 
 	}
 
@@ -55,6 +80,9 @@ public class ApplicationSystemT {
 		assertEquals(201, response.statusCode());
 
 		String tokenId = response.getBody().asString();
+		createdTokenId.add(tokenId); // add token to a list of created tokens,
+										// so it can be removed after testcase
+
 		Token tokenFromDb = getTokenFromDb(tokenId);
 		assertEquals(GOOGLE_URL, tokenFromDb.getUrl().toString());
 
@@ -65,17 +93,21 @@ public class ApplicationSystemT {
 		assertNull(tokenFromDb);
 	}
 
+	@Test
 	public void shouldRedirectToUrlFromToken_UntilTtlReached() throws InterruptedException {
 		Response response = performPostReqestForTokenWithGoogleUrl();
 		assertEquals(201, response.statusCode());
+
 		String tokenId = response.getBody().asString();
+		createdTokenId.add(tokenId); // add token to a list of created tokens,
+										// so it can be removed after testcase
 
 		Token tokenFromDb = getTokenFromDb(tokenId);
 		assertEquals(GOOGLE_URL, tokenFromDb.getUrl().toString());
 
 		for (int i = 1; i < ttl; i++) {
-			RestAssured.given().when().redirects().follow(false).get(TOKEN_REST_ENDPOINT + "/" + tokenId).then().statusCode(302).and()
-					.header("location", GOOGLE_URL);
+			RestAssured.given().when().redirects().follow(false).get(TOKEN_REST_ENDPOINT + "/" + tokenId).then()
+					.statusCode(302).and().header("location", GOOGLE_URL);
 			Thread.sleep(1000);
 		}
 	}

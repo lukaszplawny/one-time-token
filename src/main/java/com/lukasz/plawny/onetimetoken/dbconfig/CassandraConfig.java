@@ -36,13 +36,14 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 		bean.setContactPoints(nodes);
 		bean.setUsername(username);
 		bean.setPassword(password);
+		bean.setPort(port);
 		return bean;
 	}
 
 	@Override
 	protected List<CreateKeyspaceSpecification> getKeyspaceCreations() {
 		List<CreateKeyspaceSpecification> createKeyspaceSpecifications = new ArrayList<>();
-		createKeyspaceSpecifications.add(getKeySpaceSpecification());
+		createKeyspaceSpecifications.add(getKeyspaceSpecification());
 		return createKeyspaceSpecifications;
 	}
 
@@ -66,7 +67,7 @@ public class CassandraConfig extends AbstractCassandraConfiguration {
 		return port;
 	}
 
-	private CreateKeyspaceSpecification getKeySpaceSpecification() {
+	private CreateKeyspaceSpecification getKeyspaceSpecification() {
 		CreateKeyspaceSpecification oneTimeTokenKeyspace = new CreateKeyspaceSpecification();
 		DataCenterReplication dcr = new DataCenterReplication("dc1", 1);
 		oneTimeTokenKeyspace.name(KEYSPACE);
